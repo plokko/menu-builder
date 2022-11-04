@@ -1,0 +1,34 @@
+{
+    "name": "plokko/menu-builder",
+    "description": "Laravel menu builder",
+    "keywords": [
+        "laravel",
+        "menu",
+        "builder",
+        "helper"
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "require-dev": {},
+    "authors": [
+        {
+            "name": "Francesco Pellerone"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "plokko\\MenuBuilder\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "plokko\\MenuBuilder\\MenuBuilderServiceProvider"
+            ],
+            "aliases": {
+                "Menu": "plokko\\MenuBuilder\\Facades\\Menu"
+            }
+        }
+    }
+}
