@@ -10,7 +10,7 @@ use plokko\MenuBuilder\Contracts\MenuInterface;
 
 class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
 {
-    protected
+    private
         /** @var MenuItem[] */
         $items = [],
         $trans = null;
