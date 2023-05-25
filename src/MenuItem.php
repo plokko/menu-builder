@@ -20,6 +20,8 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
     use MenuCallbackTrait;
 
     protected
+        /**@var MenuBuilder* */
+        $root,
         /**@var MenuInterface* */
         $parent,
         $name,
@@ -31,10 +33,11 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
         /** @var MenuItem[] */
         $items = [];
 
-    function __construct(MenuInterface $parent, $name)
+    function __construct(MenuBuilder $root, MenuInterface $parent, $name)
     {
         $this->parent = $parent;
         $this->name = $name;
+        $this->root = $root;
     }
 
     public function subItem($name, $forceTwoLevels = true): MenuItem
@@ -43,7 +46,7 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
             return $this->parent->subItem($name);
         } else {
             if (!isset($this->items[$name]))
-                $this->items[$name] = new MenuItem($this, $name);
+                $this->items[$name] = new MenuItem($this->root, $this, $name);
             return $this->items[$name];
         }
     }
@@ -126,26 +129,30 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
      * @return array|null
      * @internal
      */
-    function _toMenuItem(array $opt = [])
+    function _toMenuItem(array $opt = [],$level=0)
     {
+
         if (!$this->isVisible())
             return null;
+
         $data = array_merge($this->attr, [
             'url' => $this->url,
             'name' => empty($this->label) ?
-                (empty($opt['label']) ? $this->name : $opt['label']) :
+                (empty($opt['label']) ? $this->root->__($this->name) : $opt['label']) :
                 $this->label,
         ]);
+
         if (count($this->items) > 0) {
             $data['items'] = [];
-            foreach ($this->items as $item) {
+            foreach ($this->items AS $item) {
                 //$opt = [];
-                $e = $item->_toMenuItem($opt);
+                $e = $item->_toMenuItem($opt,$level+1);
                 if ($e) {
                     $data['items'][] = $e;
                 }
             }
         }
+
         return $data;
     }
 

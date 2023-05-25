@@ -9,6 +9,7 @@ use plokko\MenuBuilder\MenuItem;
 interface MenuInterface
 {
     public function item($name): MenuItem;
+    public function category($name): MenuItem;
 
     /**
      * Set root translation for menu item, if null translation will be disabled

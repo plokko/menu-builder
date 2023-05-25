@@ -16,6 +16,10 @@ trait MenuCallbackTrait
     {
         return $this->parent->item($name);
     }
+    public function category($name): MenuItem
+    {
+        return $this->parent->category($name);
+    }
 
     public function removeItem($name): MenuBuilder
     {

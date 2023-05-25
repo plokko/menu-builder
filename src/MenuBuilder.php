@@ -50,10 +50,7 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
         $data = [];
         foreach ($this->items as $name => $item) {
             $opt = [];
-            if ($this->trans) {
-                $opt['label'] = trans($this->trans . '.' . $name);
-            }
-            $e = $item->_toMenuItem($opt);
+            $e = $item->_toMenuItem($opt,0);
             if ($e) {
                 $data[] = $e;
             }
@@ -93,7 +90,18 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
     public function item($name): MenuItem
     {
         if (!isset($this->items[$name]))
-            $this->items[$name] = new MenuItem($this, $name);
+            $this->items[$name] = new MenuItem($this,$this, $name);
+        return $this->items[$name];
+    }
+    /**
+     * Adds or get a menu category
+     * @param string $name
+     * @return MenuItem
+     */
+    public function category($name): MenuItem
+    {
+        if (!isset($this->items[$name]))
+            $this->items[$name] = new MenuCategoryItem($this,$this, $name);
         return $this->items[$name];
     }
 
@@ -153,5 +161,16 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
             }
         }
         return false;
+    }
+
+    public function _get($k){
+        if($k === 'trans')
+            return $this->$k;
+    }
+
+    public function __($trans_key,$replace=[],$locale=null){
+        return ($this->trans)?
+            trans($this->trans.'.'.$trans_key,$replace,$locale)
+            :$trans_key;
     }
 }
