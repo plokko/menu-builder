@@ -129,11 +129,11 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
      * @return array|null
      * @internal
      */
-    function _toMenuItem(array $opt = [],$level=0)
+    function _toMenuItem(array $opt = [], $level = 0)
     {
-
-        if (!$this->isVisible())
+        if (!$this->isVisible()) {
             return null;
+        }
 
         $data = array_merge($this->attr, [
             'url' => $this->url,
@@ -144,9 +144,9 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
 
         if (count($this->items) > 0) {
             $data['items'] = [];
-            foreach ($this->items AS $item) {
+            foreach ($this->items as $item) {
                 //$opt = [];
-                $e = $item->_toMenuItem($opt,$level+1);
+                $e = $item->_toMenuItem($opt, $level + 1);
                 if ($e) {
                     $data['items'][] = $e;
                 }
@@ -166,8 +166,18 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
                 return false;
             }
         }
-        if (!$this->checkRoles())
+        if (!$this->checkRoles()) {
             return false;
+        }
+
+        foreach (['hasAnyPermissions', 'hasAnyPermissions',] as $k) {
+            if (
+                !empty($this->conditions[$k])
+                && !Auth::user()->$k(...$this->conditions[$k])
+            ) {
+                return false;
+            }
+        }
 
         if ($this->visibility instanceof Closure) {
             return $this->visibility($this);
@@ -242,6 +252,24 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
         foreach ($values as $k => $v) {
             $this->$k($v);
         }
+        return $this;
+    }
+
+    public function hasAllPermissions($permission, $guardName = null): MenuItem
+    {
+        $this->conditions['hasAllPermissions'] = func_get_args();
+        return $this;
+    }
+
+    public function hasAnyPermissions($permission, $guardName = null): MenuItem
+    {
+        $this->conditions['hasAnyPermissions'] = func_get_args();
+        return $this;
+    }
+
+    public function can($abilities, $arguments = []): MenuItem
+    {
+        $this->conditions['can']  = func_get_args();
         return $this;
     }
 }

@@ -55,5 +55,10 @@ interface MenuInterface
      */
     public function whenHasRole($roles, Closure $fn): MenuInterface;
 
-
+    /**
+     * Check user guard.
+     *
+     * @return $this
+     */
+    //public function can($abilities, $arguments = []): MenuItem;
 }
