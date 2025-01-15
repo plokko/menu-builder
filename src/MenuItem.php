@@ -170,10 +170,10 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
             return false;
         }
 
-        foreach (['hasAnyPermissions', 'hasAnyPermissions',] as $k) {
+        foreach (['hasAnyPermissions', 'hasAllPermissions'] as $method) {
             if (
-                !empty($this->conditions[$k])
-                && !Auth::user()->$k(...$this->conditions[$k])
+                !empty($this->conditions[$method])
+                && !Auth::user()->$method(...$this->conditions[$method])
             ) {
                 return false;
             }
