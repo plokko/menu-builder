@@ -5,6 +5,7 @@ namespace plokko\MenuBuilder;
 use Auth;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Gate;
 use JsonSerializable;
 use plokko\MenuBuilder\Contracts\MenuInterface;
 
@@ -13,7 +14,8 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
     private
         /** @var MenuItem[] */
         $items = [],
-        $trans = null;
+        $trans = null,
+        $policyClass = null;
 
     /**
      * Remove a menu item by name
@@ -50,7 +52,7 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
         $data = [];
         foreach ($this->items as $name => $item) {
             $opt = [];
-            $e = $item->_toMenuItem($opt,0);
+            $e = $item->_toMenuItem($opt, 0);
             if ($e) {
                 $data[] = $e;
             }
@@ -90,7 +92,7 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
     public function item($name): MenuItem
     {
         if (!isset($this->items[$name]))
-            $this->items[$name] = new MenuItem($this,$this, $name);
+            $this->items[$name] = new MenuItem($this, $this, $name);
         return $this->items[$name];
     }
     /**
@@ -101,7 +103,7 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
     public function category($name): MenuItem
     {
         if (!isset($this->items[$name]))
-            $this->items[$name] = new MenuCategoryItem($this,$this, $name);
+            $this->items[$name] = new MenuCategoryItem($this, $this, $name);
         return $this->items[$name];
     }
 
@@ -163,14 +165,28 @@ class MenuBuilder implements MenuInterface, Arrayable, JsonSerializable
         return false;
     }
 
-    public function _get($k){
-        if($k === 'trans')
+    public function _get($k)
+    {
+        if ($k === 'trans')
             return $this->$k;
     }
 
-    public function __($trans_key,$replace=[],$locale=null){
-        return ($this->trans)?
-            trans($this->trans.'.'.$trans_key,$replace,$locale)
-            :$trans_key;
+    public function __($trans_key, $replace = [], $locale = null)
+    {
+        return ($this->trans) ?
+            trans($this->trans . '.' . $trans_key, $replace, $locale)
+            : $trans_key;
+    }
+
+
+    public function usePolicy($policyClass): MenuInterface
+    {
+        $this->policyClass = $policyClass;
+        return $this;
+    }
+
+    public function _checkPolicy(string $page): bool
+    {
+        return ($this->policyClass == null || Gate::allows('view', [$this->policyClass, $page]));
     }
 }

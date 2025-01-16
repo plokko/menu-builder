@@ -182,6 +182,11 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
         if ($this->visibility instanceof Closure) {
             return $this->visibility($this);
         }
+
+        if (!$this->_checkPolicy($this->name)) {
+            return false;
+        }
+
         return $this->visibility;
     }
 

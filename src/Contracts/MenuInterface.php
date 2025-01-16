@@ -58,7 +58,15 @@ interface MenuInterface
     /**
      * Check user guard.
      *
+     * @param mixed $policyClass
      * @return $this
      */
     //public function can($abilities, $arguments = []): MenuItem;
+
+    public function usePolicy($policyClass): MenuInterface;
+
+    /**
+     * @internal
+     */
+    public function _checkPolicy(string $page): bool;
 }

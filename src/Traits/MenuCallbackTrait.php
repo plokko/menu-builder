@@ -68,4 +68,14 @@ trait MenuCallbackTrait
         return $this;
     }
 
+    public function usePolicy($policyClass): MenuInterface
+    {
+        $this->parent->usePolicy($policyClass);
+        return $this;
+    }
+
+    public function _checkPolicy(string $page): bool
+    {
+        return $this->parent->_checkPolicy($page);
+    }
 }
