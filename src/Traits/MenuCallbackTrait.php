@@ -58,7 +58,10 @@ trait MenuCallbackTrait
 
     public function when($condition, Closure $fn): MenuInterface
     {
-        $this->parent->when($condition, $fn);
+        if (($condition instanceof Closure && $condition()) || $condition) {
+            // Condition met
+            $fn($this);
+        }
         return $this;
     }
 
