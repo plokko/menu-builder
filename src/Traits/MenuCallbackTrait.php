@@ -31,7 +31,7 @@ trait MenuCallbackTrait
         return $this->parent->clear();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->parent->toArray();
     }
