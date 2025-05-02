@@ -179,6 +179,12 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
             }
         }
 
+        if (!empty($this->conditions['hasRoleOrPermission'])) {
+            if (! Auth::user()->hasAnyRole($this->conditions['hasRoleOrPermission']) && ! Auth::user()->hasAnyPermission($this->conditions['hasRoleOrPermission'])) {
+                return false;
+            }
+        }
+
         if ($this->visibility instanceof Closure) {
             return $this->visibility($this);
         }
@@ -269,6 +275,21 @@ class MenuItem implements MenuInterface, Arrayable, JsonSerializable
     public function hasAnyPermissions($permission, $guardName = null): MenuItem
     {
         $this->conditions['hasAnyPermissions'] = func_get_args();
+        return $this;
+    }
+
+    /**
+     * @param string|array $roleOrPermission
+     * @return $this
+     */
+    public function hasRoleOrPermission($roleOrPermission): MenuItem
+    {
+        $rolesOrPermissions = is_array($roleOrPermission)
+            ? $roleOrPermission
+            : explode('|', $roleOrPermission);
+
+        $this->conditions['hasRoleOrPermission'] = $rolesOrPermissions;
+
         return $this;
     }
 
